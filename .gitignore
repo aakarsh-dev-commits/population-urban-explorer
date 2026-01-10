@@ -1,2 +1,10 @@
 # Jupyter Notebook checkpoints
 .ipynb_checkpoints/
+
+# Python caches
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+
+# Virtual environment
+popenv/
