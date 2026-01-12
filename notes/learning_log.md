@@ -51,3 +51,48 @@ Spatial analysis depends on both attribute data and geometry. Verifying CRS, geo
 ### Key Takeaways
 
 Plotting is not just visualization — it is a validation step to confirm that spatial data is correctly loaded and interpreted.
+
+---
+
+## Session 3 — CRS, Reprojection, and Area Computation
+
+### Objective
+
+Understand why coordinate reference systems (CRS) matter for numerical correctness and learn how to correctly compute geographic area for global datasets.
+
+### Concepts Learned
+
+- EPSG:4326 (WGS84) stores coordinates in angular units (degrees), not linear units
+- Area calculations in a geographic CRS are mathematically invalid and misleading
+- GeoPandas may allow incorrect computations to run, making CRS errors dangerous
+- Projected CRSs use linear units (meters), enabling meaningful distance and area calculations
+- Equal-area projections preserve surface area relationships across regions
+- EPSG:6933 (World Cylindrical Equal Area) is suitable for global area comparisons
+
+### What I Did
+
+- Intentionally computed area in EPSG:4326 to observe warnings and incorrect results
+- Interpreted GeoPandas warnings instead of ignoring them
+- Reprojected the dataset to an equal-area CRS (EPSG:6933)
+- Computed country areas in square meters and converted them to square kilometers
+- Verified results using known country sizes and rankings
+- Investigated unexpected outputs (Antarctica, USA vs China) and identified data semantics issues rather than computational bugs
+
+### Key Technical Insights
+
+- geometry.area returns values in the square of the CRS’s linear unit
+- Dividing by 1e6 converts square meters to square kilometers
+- Correct computation does not guarantee meaningful interpretation
+- Domain context (e.g., sovereign countries vs territories) must be handled explicitly
+- Data warnings are signals of conceptual problems, not noise
+
+### Engineering Takeaways
+
+- Never compute area or distance in EPSG:4326
+- Always verify CRS before performing geometric calculations
+- Store derived metrics (like area) once after correct computation
+- Question outputs that contradict real-world intuition
+
+### Outcome
+
+A correctly reprojected global dataset with validated country areas in km², ready for population density calculations.
