@@ -177,3 +177,75 @@ These exclusions are expected and defensible.
 - Inspect before joining
 - Validate before filtering
 - Correctness over convenience
+
+## Session 5 — Population Density Computation
+
+### Objective
+
+Compute physically meaningful population density values by combining correct population data with accurate country areas.
+
+---
+
+### Work Done
+
+- Reprojected global country geometries from EPSG:4326 to **EPSG:6933** (equal-area)
+- Computed country areas in square kilometers using projected geometry
+- Diagnosed and resolved type errors in population data
+- Converted World Bank population values from strings to numeric using safe coercion
+- Calculated population density as people per km²
+- Performed global sanity checks on area and density rankings
+
+---
+
+### Key Learnings
+
+#### 1. EPSG:4326 Is Invalid for Area Calculations
+
+- EPSG:4326 uses angular units (degrees), not linear units
+- Polygon areas computed in degrees² have no physical meaning
+- Area distortion varies with latitude
+- Equal-area projections are mandatory for density calculations
+
+#### 2. Equal-Area CRS Enables Correct Area Math
+
+- EPSG:6933 preserves area globally
+- Geometry area is computed in square meters
+- Explicit conversion to km² ensures interpretable units
+
+#### 3. CSV Numeric Columns Cannot Be Trusted
+
+- World Bank population values were loaded as strings (`object` dtype)
+- Arithmetic failed due to string–float operations
+- Used `pd.to_numeric(errors="coerce")` to safely convert values
+- Invalid entries were correctly converted to `NaN` instead of crashing
+
+#### 4. Density Must Be Computed on a Consistent Dataset
+
+- Population and area must exist in the same GeoDataFrame
+- Mixing columns across DataFrames is fragile and unsafe
+- Final density computation was performed on the merged, equal-area dataset
+
+#### 5. Sanity Checks Are Mandatory
+
+- Largest areas matched real-world expectations (Russia, Canada, USA, China)
+- Highest population densities were observed in known dense countries (Bangladesh, Rwanda, India, Netherlands)
+- Low-density regions behaved as expected
+- Results were numerically and geographically plausible
+
+---
+
+### Final Outcome
+
+- Successfully computed global population density (people per km²)
+- All calculations are physically meaningful and defensible
+- Dataset is now ready for visualization and spatial analysis
+
+---
+
+### Concepts Locked In
+
+- Geographic CRS vs projected CRS
+- Equal-area projections for density calculations
+- Safe numeric coercion in pandas
+- Importance of unit awareness
+- Data validation through sanity checks
