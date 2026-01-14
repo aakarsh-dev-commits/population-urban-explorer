@@ -96,3 +96,84 @@ Understand why coordinate reference systems (CRS) matter for numerical correctne
 ### Outcome
 
 A correctly reprojected global dataset with validated country areas in km², ready for population density calculations.
+
+## Session 4 — Population Data Ingestion & Join Resolution
+
+### Objective
+
+Attach reliable country-level population data to global country geometries while avoiding silent data corruption due to identifier mismatches.
+
+---
+
+### Work Done
+
+- Downloaded World Bank **World Development Indicators** population data (`SP.POP.TOTL`) for **2022**
+- Loaded Natural Earth Admin-0 country geometries
+- Attempted initial population–geometry join
+- Diagnosed unexpected missing population values after merge
+- Investigated Natural Earth schema and identifier design
+- Compared:
+  - Admin-0 Countries vs Admin-0 Sovereignty datasets
+  - Natural Earth versions **5.1.1 vs 5.0**
+- Identified sovereignty vs ISO-3 mismatch (`SOV_A3 ≠ ISO-3`)
+- Switched to **Admin-0 sovereignty v5.0** to obtain `ADM0_A3`
+- Re-merged population data using ISO-3 (`ADM0_A3 ↔ Country Code`)
+- Audited and documented remaining missing entities
+
+---
+
+### Key Learnings
+
+#### 1. Country Names Are Unsafe Join Keys
+
+- Human-readable names vary across datasets
+- Minor political or spelling differences cause silent join failures
+- ISO-3 codes are required for reliable cross-dataset joins
+
+#### 2. Natural Earth Uses Multiple Identifier Semantics
+
+- `SOV_A3` represents political sovereignty, not strict ISO-3
+- Values like `US1`, `FR1`, `AU1` encode sovereignty groupings
+- World Bank data uses **strict ISO-3**
+- Identifier semantics must be understood before joining
+
+#### 3. Dataset Versioning Affects Schema
+
+- Natural Earth v5.1 prioritizes sovereignty representation
+- Natural Earth v5.0 Admin-0 sovereignty exposes `ADM0_A3`
+- Choosing the correct dataset version is a data-engineering decision
+
+#### 4. Left Joins Are Essential for Validation
+
+- Left joins expose mismatches and missing entities
+- Inner joins would silently drop problematic records
+- Explicit inspection of `NaN` rows is required for correctness
+
+#### 5. Missing Data Can Be Correct
+
+Remaining missing entities (e.g. Antarctica, Western Sahara, Somaliland, Northern Cyprus, Taiwan, Kosovo) are:
+
+- Non-sovereign
+- Politically indeterminate
+- Or inconsistently reported by the World Bank
+
+These exclusions are expected and defensible.
+
+---
+
+### Final Outcome
+
+- Successfully merged global population data with country geometries using ISO-3
+- No major sovereign countries missing
+- All exclusions are explicit, documented, and explainable
+- Phase 1 data foundation is now correct and trustworthy
+
+---
+
+### Concepts Locked In
+
+- ISO-3 vs sovereignty identifiers
+- Data integration vs cartographic representation
+- Inspect before joining
+- Validate before filtering
+- Correctness over convenience
