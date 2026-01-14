@@ -249,3 +249,41 @@ Compute physically meaningful population density values by combining correct pop
 - Safe numeric coercion in pandas
 - Importance of unit awareness
 - Data validation through sanity checks
+
+# Session 6 — Global Population Density Visualization (Log Scale)
+
+## Objective
+
+Visualize global population density in a way that preserves meaningful differences between countries with extremely uneven population distributions.
+
+---
+
+## Key Problems Identified
+
+- Population density varies across **multiple orders of magnitude** (e.g., <1 to >1000 people/km²).
+- Linear color scaling caused most countries to collapse into similar colors.
+- EPSG:4326 (degrees) produces incorrect area calculations.
+
+---
+
+## Core Concepts Learned
+
+### 1. Why Log Scaling is Necessary
+
+- Linear scales hide variation when data is exponentially distributed.
+- Log scaling spreads values across orders of magnitude.
+- Enables meaningful visual comparison between low-density and high-density regions.
+
+**Conclusion:** Log scale is more appropriate than linear or quantile for global population density.
+
+---
+
+### 2. Correct CRS for Area Computation
+
+- EPSG:4326 → degrees → invalid for area
+- EPSG:6933 → equal-area projection → meters
+
+```python
+world_eq = world.to_crs("EPSG:6933")
+world_eq["area_km2"] = world_eq.geometry.area / 1e6
+```
