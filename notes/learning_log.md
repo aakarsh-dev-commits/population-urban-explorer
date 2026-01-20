@@ -287,3 +287,115 @@ Visualize global population density in a way that preserves meaningful differenc
 world_eq = world.to_crs("EPSG:6933")
 world_eq["area_km2"] = world_eq.geometry.area / 1e6
 ```
+
+# Session 7 — Interactive Global Population Density Map (2D)
+
+## Objective
+
+Build a scientifically correct and interactive global population density map that:
+
+- Preserves mathematical correctness of density values
+- Uses log scaling to handle extreme variance
+- Is visually interpretable and user-friendly
+
+---
+
+## Key Concepts Learned
+
+### 1. Separation of CRS by Purpose
+
+- **EPSG:6933 (equal-area)** was used for computing:
+  - country area
+  - population density
+- **EPSG:4326 (WGS84)** was required for:
+  - GeoJSON export
+  - Plotly / web-based visualization
+
+This reinforced the rule:
+
+> _Compute in equal-area CRS, visualize in geographic CRS._
+
+---
+
+### 2. Why Log Scaling Is Necessary
+
+Population density varies by several orders of magnitude globally.
+
+Using a linear scale:
+
+- Collapses most countries into the same color
+- Makes meaningful comparison impossible
+
+Using `log10(pop_density)`:
+
+- Preserves relative ratios
+- Makes both sparse and dense regions distinguishable
+- Keeps the visualization scientifically defensible
+
+---
+
+### 3. Choropleth as a Data–Geometry Join
+
+An interactive choropleth is fundamentally:
+
+- A **tabular dataset**
+- Joined to **geographic features**
+- Using a shared identifier (`ADM0_A3` / ISO-3)
+
+Plotly internally performs this join using:
+
+- `locations` (DataFrame column)
+- `featureidkey` (GeoJSON property)
+
+---
+
+### 4. GeoDataFrame → GeoJSON Conversion
+
+Plotly does not accept GeoPandas objects directly.
+
+Workflow:
+
+1. Reproject geometry to EPSG:4326
+2. Convert GeoDataFrame to GeoJSON via `.to_json()`
+3. Load into Python dict with `json.loads()`
+
+This step is essential for correct rendering.
+
+---
+
+### 5. Separation of Computation vs Presentation Columns
+
+To keep tooltips readable:
+
+- Raw computation columns were preserved
+- Separate `_disp` columns were created for display
+  - Rounded values
+  - Human-friendly formatting
+
+This follows clean data design principles.
+
+---
+
+### 6. Hover Semantics and UI Design
+
+Hover tooltips were explicitly designed to show:
+
+- Country name
+- Area (km²)
+- Population
+- Population density (people/km²)
+
+Internal or technical fields (ISO codes, log values) were hidden.
+
+This improved interpretability without sacrificing rigor.
+
+---
+
+## Outcome
+
+- Successfully built an interactive 2D global population density map
+- Validated correct CRS handling
+- Confirmed log-scaled density is the canonical metric for the project
+- Established a reusable visualization pipeline for future projections
+
+---
