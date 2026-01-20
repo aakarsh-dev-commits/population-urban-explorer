@@ -399,3 +399,68 @@ This improved interpretability without sacrificing rigor.
 - Established a reusable visualization pipeline for future projections
 
 ---
+
+# Session 8 — 3D Interactive Globe (Population Density)
+
+## Objective
+
+Extend the interactive visualization layer by rendering global population density on a 3D globe, while preserving the exact same data, scaling, and methodology established in earlier sessions.
+
+---
+
+## Key Concepts Learned
+
+### 1. Projection Changes Perception, Not Data
+
+- The underlying dataset (population density) remained unchanged.
+- Only the **map projection** changed from 2D to 3D (orthographic).
+- This reinforced the idea that visualization alters _how_ data is perceived, not _what_ the data represents.
+
+---
+
+### 2. Orthographic Projection for Global Intuition
+
+- The orthographic projection simulates viewing Earth from space.
+- It preserves hemispheric relationships and spatial adjacency.
+- Helps identify continental-scale patterns that can be visually distorted or flattened in 2D maps.
+
+---
+
+### 3. Reuse of a Stable Visualization Pipeline
+
+The 3D globe reused:
+
+- EPSG:4326 geometries
+- `log_density` as the canonical metric
+- ISO-3 / ADM0_A3 join logic
+- Hover semantics (country name, area, population, density)
+
+No recomputation or re-binning was introduced.
+
+---
+
+### 4. Consistency Across Visual Representations
+
+- High-density regions (South Asia, parts of Europe) appeared consistently prominent.
+- Low-density regions (Canada, Australia, Russia) remained subdued.
+- Rotating the globe changed perspective but not meaning.
+
+This validated that the visualization pipeline was robust.
+
+---
+
+### 5. Role of 3D Visualization in GIS
+
+- 3D globes are best used for **exploration and intuition**, not measurement.
+- Quantitative analysis must still rely on correct projections and numerical computation.
+- The globe complements, rather than replaces, 2D analytical maps.
+
+---
+
+## Outcome
+
+- Successfully built an interactive 3D globe for global population density.
+- Confirmed methodological consistency between static, 2D interactive, and 3D views.
+- Completed the visualization component of Phase 1.
+
+---
