@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roadmap - Population Urban Explorer</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="background-globes"></div>
+
+    <div class="app-container">
+        <header class="glass-panel">
+            <div class="logo">
+                <h1>Population Urban Explorer</h1>
+                <span class="badge">Future Plans</span>
+            </div>
+            <nav>
+                <a href="index.html" class="nav-link">Dashboard</a>
+                <a href="roadmap.html" class="nav-link active">Future Roadmap</a>
+            </nav>
+        </header>
+
+        <main class="roadmap-container">
+            <div class="roadmap-timeline">
+                
+                <!-- Phase 1 (Completed) -->
+                <div class="phase-card glass-panel completed">
+                    <div class="phase-header">
+                        <h2>Phase 1</h2>
+                        <span class="status-badge done">Completed</span>
+                    </div>
+                    <h3>Foundation (Data & Visualization)</h3>
+                    <ul>
+                        <li>Data Ingestion (Natural Earth, World Bank)</li>
+                        <li>Normalization & Equal-Area Reprojection</li>
+                        <li>Static & Interactive Visualizations</li>
+                        <li>3D Globe Integration</li>
+                    </ul>
+                </div>
+
+                <!-- Phase 2 -->
+                <div class="phase-card glass-panel upcoming">
+                    <div class="phase-header">
+                        <h2>Phase 2</h2>
+                        <span class="status-badge next">Next Steps</span>
+                    </div>
+                    <h3>Spatial Intelligence</h3>
+                    <ul>
+                        <li><strong>Hotspot Detection:</strong> Use PySAL to find statistically significant clusters.</li>
+                        <li><strong>Clustering:</strong> Implement KMeans to segment regions.</li>
+                        <li><strong>Interpolation:</strong> IDW for continuous density surfaces.</li>
+                    </ul>
+                </div>
+
+                <!-- Phase 3 -->
+                <div class="phase-card glass-panel upcoming">
+                    <div class="phase-header">
+                        <h2>Phase 3</h2>
+                        <span class="status-badge future">Future</span>
+                    </div>
+                    <h3>Predictive Modeling</h3>
+                    <ul>
+                        <li><strong>Forecasting:</strong> Regression models for 2025/2030 predictions.</li>
+                        <li><strong>Vulnerability Analysis:</strong> Infrastructure stress testing against growth.</li>
+                    </ul>
+                </div>
+
+                <!-- Phase 4 -->
+                <div class="phase-card glass-panel upcoming">
+                    <div class="phase-header">
+                        <h2>Phase 4</h2>
+                        <span class="status-badge future">Future</span>
+                    </div>
+                    <h3>Packaging</h3>
+                    <ul>
+                        <li>Modular Python Package conversion.</li>
+                        <li>Comprehensive Documentation & Installation Guides.</li>
+                    </ul>
+                </div>
+
+            </div>
+        </main>
+    </div>
+</body>
+</html>

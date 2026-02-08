@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Population Urban Explorer - Phase 1</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="background-globes"></div>
+    
+    <div class="app-container">
+        <header class="glass-panel">
+            <div class="logo">
+                <h1>Population Urban Explorer</h1>
+                <span class="badge">Phase 1: Foundation</span>
+            </div>
+            <nav>
+                <a href="index.html" class="nav-link active">Dashboard</a>
+                <a href="roadmap.html" class="nav-link">Future Roadmap</a>
+            </nav>
+        </header>
+
+        <main class="dashboard-grid">
+            <!-- Controls Section -->
+            <section class="controls glass-panel">
+                <h2>Visualization Mode</h2>
+                <div class="toggle-group">
+                    <button class="nav-btn" data-view="static" onclick="switchView('static')">
+                        <span class="icon">📄</span> Static Map
+                    </button>
+                    <button class="nav-btn" data-view="interactive" onclick="switchView('interactive')">
+                        <span class="icon">🗺️</span> Interactive 2D
+                    </button>
+                    <button class="nav-btn active" data-view="globe" onclick="switchView('globe')">
+                        <span class="icon">🌍</span> 3D Globe
+                    </button>
+                </div>
+                <div class="info-box">
+                    <h3>Current View</h3>
+                    <p id="view-description">Exploring global population density through an immersive 3D orthographic projection.</p>
+                </div>
+            </section>
+
+            <!-- Viewport Section -->
+            <section class="viewport glass-panel">
+                <div id="visual-container" class="visual-container">
+                    <!-- Content injected by JS -->
+                    <iframe src="assets/globe_population_density.html" frameborder="0" class="visual-content"></iframe>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
