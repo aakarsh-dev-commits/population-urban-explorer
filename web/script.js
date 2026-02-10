@@ -1,46 +1,59 @@
-function switchView(viewType) {
-    const container = document.getElementById('visual-container');
-    const descText = document.getElementById('view-description');
-    
-    // Reset buttons
-    document.querySelectorAll('.nav-btn').forEach(btn => {
-        btn.classList.remove('active');
-    });
-    
-    // Set active button
-    const activeBtn = document.querySelector(`.nav-btn[data-view="${viewType}"]`);
-    if (activeBtn) activeBtn.classList.add('active');
+// Visualization Drawer Toggle Logic
+const vizDrawer = document.getElementById('viz-drawer');
+const vizToggleBtn = document.getElementById('viz-toggle');
 
-    // Update Content
-    let content = '';
-    let description = '';
-
-    switch(viewType) {
-        case 'static':
-            content = '<img src="assets/static_population_density.png" alt="Static Map" class="visual-content" style="padding: 2rem;">';
-            description = 'High-resolution static choropleth map generated with Matplotlib. Suitable for publication and printing.';
-            break;
-        case 'interactive':
-            content = '<iframe src="assets/interactive_population_density.html" frameborder="0" class="visual-content"></iframe>';
-            description = 'Interactive 2D map powered by Plotly. Hover over countries to see detailed population metrics.';
-            break;
-        case 'globe':
-            content = '<iframe src="assets/globe_population_density.html" frameborder="0" class="visual-content"></iframe>';
-            description = 'Immersive 3D orthographic globe view. Rotate and explore global density patterns in a realistic projection.';
-            break;
-    }
-
-    // Smooth transition
-    container.style.opacity = 0;
-    setTimeout(() => {
-        container.innerHTML = content;
-        descText.textContent = description;
-        container.style.opacity = 1;
-    }, 200);
-}
-
-// Ensure globe loads by default if iframe caching issues occur
-document.addEventListener("DOMContentLoaded", () => {
-    // Already set in HTML, but good for safety
-    // switchView('globe'); 
+vizToggleBtn.addEventListener('click', () => {
+    vizDrawer.classList.toggle('collapsed');
 });
+
+// Mode Toggle Logic (2D vs 3D)
+const modeOptions = document.querySelectorAll('.mode-option');
+const globeFrame = document.getElementById('globe-frame');
+
+modeOptions.forEach(option => {
+    option.addEventListener('click', () => {
+        // Remove active class from all
+        modeOptions.forEach(opt => opt.classList.remove('active'));
+        // Add active class to clicked
+        option.classList.add('active');
+        
+        // Switch iframe source
+        const mode = option.dataset.mode;
+        if (mode === '3d') {
+            globeFrame.src = 'assets/globe_population_density.html';
+        } else if (mode === '2d') {
+            globeFrame.src = 'assets/interactive_population_density.html';
+        }
+    });
+});
+
+// Scrollytelling Animation Logic
+// Uses IntersectionObserver to fade in sections as they scroll into view
+const observerOptions = {
+    root: null, // viewport
+    rootMargin: '0px',
+    threshold: 0.3 // Trigger when 30% of the section is visible
+};
+
+const observer = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('active');
+            // Optional: Log current phase for debugging or future map triggers
+            console.log('Active Section:', entry.target.id);
+        } else {
+            // Optional: Remove class to fade out when scrolling away
+            entry.target.classList.remove('active');
+        }
+    });
+}, observerOptions);
+
+document.querySelectorAll('.story-section').forEach(section => {
+    observer.observe(section);
+});
+
+// Start with drawer expanded on large screens, collapsed on mobile?
+// For now, default is expanded (50% width) as defined in CSS.
+if (window.innerWidth < 768) {
+    vizDrawer.classList.add('collapsed');
+}

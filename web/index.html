@@ -3,59 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Population Urban Explorer - Phase 1</title>
-    <link rel="stylesheet" href="style.css">
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>Global Population Dynamics | Urban Explorer</title>
+    <link rel="stylesheet" href="redesign.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="background-globes"></div>
-    
-    <div class="app-container">
-        <header class="glass-panel">
-            <div class="logo">
-                <h1>Population Urban Explorer</h1>
-                <span class="badge">Phase 1: Foundation</span>
-            </div>
-            <nav>
-                <a href="index.html" class="nav-link active">Dashboard</a>
-                <a href="roadmap.html" class="nav-link">Future Roadmap</a>
-            </nav>
-        </header>
 
-        <main class="dashboard-grid">
-            <!-- Controls Section -->
-            <section class="controls glass-panel">
-                <h2>Visualization Mode</h2>
-                <div class="toggle-group">
-                    <button class="nav-btn" data-view="static" onclick="switchView('static')">
-                        <span class="icon">📄</span> Static Map
-                    </button>
-                    <button class="nav-btn" data-view="interactive" onclick="switchView('interactive')">
-                        <span class="icon">🗺️</span> Interactive 2D
-                    </button>
-                    <button class="nav-btn active" data-view="globe" onclick="switchView('globe')">
-                        <span class="icon">🌍</span> 3D Globe
-                    </button>
-                </div>
-                <div class="info-box">
-                    <h3>Current View</h3>
-                    <p id="view-description">Exploring global population density through an immersive 3D orthographic projection.</p>
+    <div id="app-container">
+        
+        <!-- RIGHT: Visualization Drawer (Persistent 3D Globe) -->
+        <div id="viz-drawer">
+            <button id="viz-toggle"></button>
+            <iframe src="assets/globe_population_density.html" id="globe-frame" title="3D Population Globe"></iframe>
+        </div>
+
+        <!-- LEFT: Mode Toggle Tab -->
+        <div id="mode-tab">
+            <div class="mode-option active" data-mode="3d">3D GLOBE</div>
+            <div class="mode-option" data-mode="2d">2D MAP</div>
+        </div>
+
+        <!-- LEFT: Scrollytelling Content -->
+        <div id="story-scroller">
+            
+            <!-- HERO -->
+            <section class="story-section" id="hero">
+                <h1>GLOBAL<br>POPULATION<br>DYNAMICS</h1>
+                <p style="font-size: 1.5rem; color: var(--accent-color); margin-bottom: 0.5rem;">MAPPING THE HUMAN FOOTPRINT</p>
+                <p>An open-source pipeline to analyze urbanization, identify vulnerabilities, and forecast future trends using spatial machine learning.</p>
+                <div class="hero-margin-box">
+                    <span>EST. 2026</span>
+                    <span>POPULATION V1</span>
                 </div>
             </section>
 
-            <!-- Viewport Section -->
-            <section class="viewport glass-panel">
-                <div id="visual-container" class="visual-container">
-                    <!-- Content injected by JS -->
-                    <iframe src="assets/globe_population_density.html" frameborder="0" class="visual-content"></iframe>
+            <!-- THE CHALLENGE -->
+            <section class="story-section" id="problem">
+                <div class="phase-number">01</div>
+                <h2>THE CHALLENGE</h2>
+                <h3>Fragmented Data in a Rapidly Urbanizing World</h3>
+                <p>Population dynamics serve as one of the strongest indicators for economic health and policy planning. However, the current landscape of geospatial data is fragmented.</p>
+                <p>Information exists in disconnected formats such as CSV tables, raster GeoTIFFs, and satellite imagery. Existing tools are bifurcated: either strictly GIS-focused (requiring complex manual work) or ML-focused (requiring high-end compute), with no unified bridge.</p>
+                <div class="phase-card">
+                    <h4 style="color:white; margin-bottom:0.5rem">WHY IT MATTERS</h4>
+                    <p style="margin:0">Developing countries often rely on outdated census data, making it difficult for local authorities to track rapid urbanization or identify vulnerable "coldspots" in infrastructure.</p>
                 </div>
             </section>
-        </main>
+
+            <!-- THE SOLUTION -->
+            <section class="story-section" id="solution">
+                <div class="phase-number">02</div>
+                <h2>THE SOLUTION</h2>
+                <h3>A Unified Spatial Intelligence Pipeline</h3>
+                <p>This project builds an open-source pipeline that leverages a "Research-based" approach to implement spatial algorithms and a "Software-based" approach to package these into a reusable Python toolkit.</p>
+                <p>We normalize data from disparate sources (World Bank, Natural Earth) and apply Machine Learning techniques to provide actionable insights for local governance.</p>
+            </section>
+
+            <!-- METHODOLOGY: PHASE 1 -->
+            <section class="story-section" id="phase1">
+                <div class="phase-number">03</div>
+                <h2>PHASE I: FOUNDATION</h2>
+                <h3>Data Engineering & Visualization</h3>
+                <ul style="list-style: none; padding:0; color: var(--text-secondary);">
+                    <li style="margin-bottom: 1rem;"><strong style="color:white">Data Ingestion:</strong> Integration of Natural Earth shapefiles and World Bank population statistics.</li>
+                    <li style="margin-bottom: 1rem;"><strong style="color:white">Processing:</strong> Normalization of country names and conversion to equal-area CRS (EPSG:6933) to calculate accurate land area.</li>
+                    <li style="margin-bottom: 1rem;"><strong style="color:white">Visualization:</strong> Implementation of interactive 3D globes (seen on the right) to visualize density spikes.</li>
+                </ul>
+            </section>
+
+            <!-- METHODOLOGY: PHASE 2 -->
+            <section class="story-section" id="phase2">
+                <div class="phase-number">04</div>
+                <h2>PHASE II: SPATIAL INTEL</h2>
+                <h3>Pattern Recognition</h3>
+                <p>We utilize PySAL to calculate spatial statistics and identify statistically significant high-density clusters (hotspots) and low-density areas.</p>
+                <p><strong>Clustering:</strong> Implementation of Unsupervised Learning (KMeans) to segment regions based on density and proximity.</p>
+            </section>
+
+            <!-- METHODOLOGY: PHASE 3 -->
+            <section class="story-section" id="phase3">
+                <div class="phase-number">05</div>
+                <h2>PHASE III: PREDICTION</h2>
+                <h3>Forecasting 2030</h3>
+                <p>Using historical time-series data to predict future population growth for 2025 and 2030 using regression models.</p>
+                <div class="phase-card" style="border-left-color: #ff0055;">
+                    <h4 style="color:white; margin-bottom:0.5rem">IMPACT</h4>
+                    <p style="margin:0">Comparing predicted growth against available infrastructure data allows us to flag potential vulnerabilities before they become crises.</p>
+                </div>
+            </section>
+
+            <!-- METHODOLOGY: PHASE 4 -->
+            <section class="story-section" id="phase4">
+                <div class="phase-number">06</div>
+                <h2>PHASE IV: PACKAGING</h2>
+                <h3>Modular & Reproducible</h3>
+                <p>Structuring the code into a modular Python package to ensure scalability and ease of use.</p>
+                <ul style="list-style: none; padding:0; color: var(--text-secondary);">
+                    <li style="margin-bottom: 1rem;"><strong style="color:white">Library Development:</strong> Organized as a reusable toolkit for other researchers.</li>
+                    <li style="margin-bottom: 1rem;"><strong style="color:white">Documentation:</strong> Clear guides for installation and usage to democratize access to spatial intelligence.</li>
+                </ul>
+            </section>
+            
+            <!-- FUTURE -->
+            <section class="story-section" id="future">
+                <h2>THE FUTURE</h2>
+                <p>This tool empowers local governance with data-driven urban planning capabilities, accessible without expensive proprietary licenses.</p>
+                <a href="#" onclick="document.getElementById('viz-drawer').classList.toggle('collapsed'); return false;" style="display:inline-block; margin-top:2rem; padding: 1rem 2rem; border: 1px solid var(--accent-color); color: var(--accent-color); text-decoration: none; text-transform: uppercase; letter-spacing: 2px; transition: all 0.3s;">
+                    Explore the Globe ➔
+                </a>
+            </section>
+
+            <footer style="padding: 4rem 10%; color: #555; font-size: 0.9rem;">
+                <p>POPULATION URBAN EXPLORER PROJECT &copy; 2026</p>
+            </footer>
+
+        </div>
     </div>
 
+    <!-- Script to handle interactions -->
     <script src="script.js"></script>
 </body>
 </html>
