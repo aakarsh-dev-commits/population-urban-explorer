@@ -68,15 +68,20 @@ def plot_interactive_choropleth(world_pop):
     fig.update_geos(
         showframe=False,
         showcoastlines=False,
-        projection_type="natural earth"
+        projection_type="natural earth",
+        bgcolor="#000000",
+        showocean=True, oceancolor="#050510",
+        showland=True,  landcolor="#111115",
+        showlakes=True, lakecolor="#050510"
     )
 
     fig.update_layout(
         title="Global Population Density (people per km², log-scaled)",
-        coloraxis_colorbar=dict(
-            title="Population density<br>(log scale)"
-        ),
-        margin={"r":0,"t":40,"l":0,"b":0}
+        coloraxis_colorbar=dict(title="Population density<br>(log scale)"),
+        margin={"r":0,"t":40,"l":0,"b":0},
+        template="plotly_dark",
+        paper_bgcolor="#000000",
+        plot_bgcolor="#000000"
     )
     
     return fig

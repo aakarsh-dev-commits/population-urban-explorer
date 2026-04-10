@@ -51,37 +51,94 @@ modeOptions.forEach(option => {
 
 // Model Toggle Logic (Top Nav)
 const topTabs = document.querySelectorAll('.top-tab');
+
+// Map each model tab to the section it should scroll to
+const tabSectionMap = {
+    'density':  'hero',
+    'hotspots': 'phase2',
+    'clusters': 'phase3',
+    'idw':      'phase4'
+};
+
+const storyScroller = document.getElementById('story-scroller');
+
 topTabs.forEach(tab => {
     tab.addEventListener('click', () => {
         topTabs.forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
         currentModel = tab.dataset.model;
         updateViz();
+
+        // Scroll the left panel to the matching section
+        const targetId = tabSectionMap[currentModel];
+        const targetEl = targetId ? document.getElementById(targetId) : null;
+        if (targetEl && storyScroller) {
+            isTabScrolling = true;
+            storyScroller.scrollTo({
+                top: targetEl.offsetTop,
+                behavior: 'smooth'
+            });
+            // Re-enable scroll observer after animation completes (~700ms)
+            setTimeout(() => { isTabScrolling = false; }, 700);
+        }
     });
 });
 
-// Scrollytelling Animation Logic
-const observerOptions = {
-    root: null,
-    rootMargin: '0px',
-    threshold: 0.3
+// ─── Scroll-driven visualization sync ───────────────────────────────────────
+// Map each section to the model it represents. Sections not listed keep the
+// current model (e.g. phase5, future, footer).
+const sectionModelMap = {
+    'hero':   'density',
+    'problem':'density',
+    'solution':'density',
+    'phase1': 'density',
+    'phase2': 'hotspots',
+    'phase3': 'clusters',
+    'phase4': 'idw',
+    'phase5': 'idw',
+    'future': 'idw'
 };
 
-const observer = new IntersectionObserver((entries, observer) => {
+// Flag to suppress scroll-driven updates while a tab click is animating
+let isTabScrolling = false;
+
+function setActiveModel(model) {
+    if (model === currentModel) return;
+    currentModel = model;
+    updateViz();
+
+    // Sync the top-nav highlight
+    topTabs.forEach(t => {
+        t.classList.toggle('active', t.dataset.model === model);
+    });
+}
+
+// Use the story scroller as the IntersectionObserver root so it fires
+// relative to the visible scroll area, not the whole viewport.
+const scrollObserverOptions = {
+    root: storyScroller,
+    rootMargin: '-40% 0px -40% 0px',  // trigger when section is roughly centred
+    threshold: 0
+};
+
+const scrollObserver = new IntersectionObserver((entries) => {
+    if (isTabScrolling) return;  // ignore during programmatic scrolls
     entries.forEach(entry => {
         if (entry.isIntersecting) {
             entry.target.classList.add('active');
+            const model = sectionModelMap[entry.target.id];
+            if (model) setActiveModel(model);
         } else {
             entry.target.classList.remove('active');
         }
     });
-}, observerOptions);
+}, scrollObserverOptions);
 
 document.querySelectorAll('.story-section').forEach(section => {
-    observer.observe(section);
+    scrollObserver.observe(section);
 });
 
-// Default drawer behavior
+// ─── Default drawer behaviour ────────────────────────────────────────────────
 if (window.innerWidth < 768) {
     vizDrawer.classList.add('collapsed');
 }

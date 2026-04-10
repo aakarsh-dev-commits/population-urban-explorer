@@ -4,13 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Global Population Dynamics | Urban Explorer</title>
+    <meta name="description" content="An open-source spatial intelligence pipeline for global population analysis — featuring hotspot detection, KMeans clustering, and IDW interpolation visualized on interactive 3D globes.">
     <link rel="stylesheet" href="redesign.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
     <div id="app-container">
-        
+
         <!-- TOP: Visualization Models Nav -->
         <nav id="top-nav">
             <div class="top-tab active" data-model="density">DENSITY</div>
@@ -18,8 +19,8 @@
             <div class="top-tab" data-model="clusters">CLUSTERS</div>
             <div class="top-tab" data-model="idw">INTERPOLATION</div>
         </nav>
-        
-        <!-- RIGHT: Visualization Drawer (Persistent 3D Globe) -->
+
+        <!-- RIGHT: Visualization Drawer -->
         <div id="viz-drawer">
             <button id="viz-toggle"></button>
             <iframe src="assets/globe_population_density.html" id="globe-frame" title="3D Population Globe"></iframe>
@@ -33,15 +34,15 @@
 
         <!-- LEFT: Scrollytelling Content -->
         <div id="story-scroller">
-            
+
             <!-- HERO -->
             <section class="story-section" id="hero">
                 <h1>GLOBAL<br>POPULATION<br>DYNAMICS</h1>
-                <p style="font-size: 1.5rem; color: var(--accent-color); margin-bottom: 0.5rem;">MAPPING THE HUMAN FOOTPRINT</p>
-                <p>An open-source pipeline to analyze urbanization, identify vulnerabilities, and forecast future trends using spatial machine learning.</p>
+                <p style="font-size: clamp(0.9rem, 1.3vw, 1.4rem); color: var(--accent-color); margin-bottom: 0.5rem;">MAPPING THE HUMAN FOOTPRINT</p>
+                <p>An open-source spatial intelligence pipeline to analyze global urbanization, identify density hotspots, and forecast population trends using statistical machine learning.</p>
                 <div class="hero-margin-box">
                     <span>EST. 2026</span>
-                    <span>POPULATION V1</span>
+                    <span>POPULATION V2 — SPATIAL ML</span>
                 </div>
             </section>
 
@@ -50,11 +51,10 @@
                 <div class="phase-number">01</div>
                 <h2>THE CHALLENGE</h2>
                 <h3>Fragmented Data in a Rapidly Urbanizing World</h3>
-                <p>Population dynamics serve as one of the strongest indicators for economic health and policy planning. However, the current landscape of geospatial data is fragmented.</p>
-                <p>Information exists in disconnected formats such as CSV tables, raster GeoTIFFs, and satellite imagery. Existing tools are bifurcated: either strictly GIS-focused (requiring complex manual work) or ML-focused (requiring high-end compute), with no unified bridge.</p>
+                <p>Population dynamics serve as one of the strongest indicators for economic health and policy planning. Yet geospatial data remains deeply fragmented — scattered across CSV tables, raster GeoTIFFs, and proprietary databases with no unified pipeline.</p>
                 <div class="phase-card">
-                    <h4 style="color:white; margin-bottom:0.5rem">WHY IT MATTERS</h4>
-                    <p style="margin:0">Developing countries often rely on outdated census data, making it difficult for local authorities to track rapid urbanization or identify vulnerable "coldspots" in infrastructure.</p>
+                    <h4 style="color:white; margin-bottom:0.5rem; font-family: var(--font-heading); text-transform: uppercase;">WHY IT MATTERS</h4>
+                    <p style="margin:0">Developing nations rely on outdated census data, making it nearly impossible to track rapid urbanization or identify vulnerable infrastructure coldspots before they become crises.</p>
                 </div>
             </section>
 
@@ -63,72 +63,113 @@
                 <div class="phase-number">02</div>
                 <h2>THE SOLUTION</h2>
                 <h3>A Unified Spatial Intelligence Pipeline</h3>
-                <p>This project builds an open-source pipeline that leverages a "Research-based" approach to implement spatial algorithms and a "Software-based" approach to package these into a reusable Python toolkit.</p>
-                <p>We normalize data from disparate sources (World Bank, Natural Earth) and apply Machine Learning techniques to provide actionable insights for local governance.</p>
+                <p>This project builds an open-source pipeline that merges World Bank population statistics with Natural Earth shapefiles and feeds them into three distinct analytical engines — all visualized through interactive 3D globes and 2D maps you can explore on the right.</p>
+                <p>Switch between the visualization tabs above to explore each analytical layer independently.</p>
             </section>
 
-            <!-- METHODOLOGY: PHASE 1 -->
+            <!-- PHASE 1: FOUNDATION -->
             <section class="story-section" id="phase1">
                 <div class="phase-number">03</div>
                 <h2>PHASE I: FOUNDATION</h2>
                 <h3>Data Engineering & Visualization</h3>
+                <div class="tag-row">
+                    <span class="tag">GeoPandas</span>
+                    <span class="tag">World Bank</span>
+                    <span class="tag">Natural Earth</span>
+                    <span class="tag">Globe.gl</span>
+                </div>
                 <ul style="list-style: none; padding:0; color: var(--text-secondary);">
-                    <li style="margin-bottom: 1rem;"><strong style="color:white">Data Ingestion:</strong> Integration of Natural Earth shapefiles and World Bank population statistics.</li>
-                    <li style="margin-bottom: 1rem;"><strong style="color:white">Processing:</strong> Normalization of country names and conversion to equal-area CRS (EPSG:6933) to calculate accurate land area.</li>
-                    <li style="margin-bottom: 1rem;"><strong style="color:white">Visualization:</strong> Implementation of interactive 3D globes (seen on the right) to visualize density spikes.</li>
+                    <li style="margin-bottom: 0.8rem;"><strong style="color:white">Data Ingestion:</strong> Integration of Natural Earth shapefiles with World Bank population statistics (2022), normalizing country names across conflicting ISO standards.</li>
+                    <li style="margin-bottom: 0.8rem;"><strong style="color:white">Processing:</strong> Reprojection to equal-area CRS (EPSG:6933) for accurate land area computation. Population density is log-scaled to handle the 10,000× range between Monaco and Mongolia.</li>
+                    <li style="margin-bottom: 0.8rem;"><strong style="color:white">Visualization:</strong> Laser-beam 3D globe using Globe.gl with a real NASA night-time Earth texture and a live starfield background — visible in the <em style="color: var(--accent-color)">DENSITY</em> tab.</li>
                 </ul>
             </section>
 
-            <!-- METHODOLOGY: PHASE 2 -->
+            <!-- PHASE 2: HOTSPOT DETECTION -->
             <section class="story-section" id="phase2">
                 <div class="phase-number">04</div>
-                <h2>PHASE II: SPATIAL INTEL</h2>
-                <h3>Pattern Recognition</h3>
-                <p>We utilize PySAL to calculate spatial statistics and identify statistically significant high-density clusters (hotspots) and low-density areas.</p>
-                <p><strong>Clustering:</strong> Implementation of Unsupervised Learning (KMeans) to segment regions based on density and proximity.</p>
+                <h2>PHASE II: HOTSPOTS</h2>
+                <h3>PySAL Local Moran's I — Spatial Autocorrelation</h3>
+                <div class="tag-row">
+                    <span class="tag">PySAL / ESDA</span>
+                    <span class="tag">libpysal</span>
+                    <span class="tag">KNN Weights</span>
+                    <span class="tag">p &lt; 0.05</span>
+                </div>
+                <p>Using PySAL's Local Moran's I statistic, every country is tested for statistically significant spatial clustering of its population density against its K=5 nearest geographic neighbors.</p>
+                <div class="phase-card">
+                    <p style="margin:0; font-size: 0.9rem;"><strong style="color: #ff4444;">■ High-High (Hotspots)</strong> — dense regions surrounded by other dense neighbours.<br><strong style="color: #4488ff;">■ Low-Low (Coldspots)</strong> — sparse regions in sparse surroundings.<br><strong style="color: #aaa;">■ Not Significant</strong> — no statistically meaningful pattern detected.</p>
+                </div>
+                <p>→ Explore this in the <em style="color: var(--accent-color)">HOTSPOTS</em> tab, rendered as a Globe.gl globe with the same space aesthetic.</p>
             </section>
 
-            <!-- METHODOLOGY: PHASE 3 -->
+            <!-- PHASE 3: CLUSTERING -->
             <section class="story-section" id="phase3">
                 <div class="phase-number">05</div>
-                <h2>PHASE III: PREDICTION</h2>
-                <h3>Forecasting 2030</h3>
-                <p>Using historical time-series data to predict future population growth for 2025 and 2030 using regression models.</p>
-                <div class="phase-card" style="border-left-color: #ff0055;">
-                    <h4 style="color:white; margin-bottom:0.5rem">IMPACT</h4>
-                    <p style="margin:0">Comparing predicted growth against available infrastructure data allows us to flag potential vulnerabilities before they become crises.</p>
+                <h2>PHASE III: CLUSTERS</h2>
+                <h3>Unsupervised Learning — KMeans Segmentation</h3>
+                <div class="tag-row">
+                    <span class="tag">scikit-learn</span>
+                    <span class="tag">KMeans (K=5)</span>
+                    <span class="tag">StandardScaler</span>
                 </div>
+                <p>KMeans clusters all countries into 5 distinct groups based on three multi-dimensional features: log population density, total area (km²), and absolute population count — all StandardScaler-normalized to treat each feature equally.</p>
+                <p>Unlike Hotspot Detection which uses geographic proximity, Clustering groups countries by their <em>statistical similarity</em> regardless of where they sit on the map — revealing surprising groupings across continents.</p>
+                <p>→ Explore this in the <em style="color: var(--accent-color)">CLUSTERS</em> tab.</p>
             </section>
 
-            <!-- METHODOLOGY: PHASE 4 -->
+            <!-- PHASE 4: INTERPOLATION -->
             <section class="story-section" id="phase4">
                 <div class="phase-number">06</div>
-                <h2>PHASE IV: PACKAGING</h2>
-                <h3>Modular & Reproducible</h3>
-                <p>Structuring the code into a modular Python package to ensure scalability and ease of use.</p>
+                <h2>PHASE IV: INTERPOLATION</h2>
+                <h3>Inverse Distance Weighting (IDW)</h3>
+                <div class="tag-row">
+                    <span class="tag">scipy cKDTree</span>
+                    <span class="tag">IDW p=2</span>
+                    <span class="tag">K=8 Neighbours</span>
+                </div>
+                <p>Using a KD-Tree for fast nearest-neighbour lookups, IDW computes a continuous population density surface across the globe — even over oceans and uncovered regions — by weighting each training point inversely to the square of its distance.</p>
+                <div class="phase-card" style="border-left-color: #ff0055;">
+                    <p style="margin:0; font-size: 0.9rem;">Unlike choropleth maps that show hard country borders, IDW reveals the <strong style="color: white">gradient of human density</strong> as a smooth, continuous field — making transition zones and density gradients visible at a glance.</p>
+                </div>
+                <p>→ Explore this in the <em style="color: var(--accent-color)">INTERPOLATION</em> tab as a fully interactive density heatmap.</p>
+            </section>
+
+            <!-- PHASE 5: PACKAGING -->
+            <section class="story-section" id="phase5">
+                <div class="phase-number">07</div>
+                <h2>PHASE V: PACKAGING</h2>
+                <h3>Modular & Reproducible Python Toolkit</h3>
+                <div class="tag-row">
+                    <span class="tag">pyproject.toml</span>
+                    <span class="tag">pytest</span>
+                    <span class="tag">ruff</span>
+                </div>
                 <ul style="list-style: none; padding:0; color: var(--text-secondary);">
-                    <li style="margin-bottom: 1rem;"><strong style="color:white">Library Development:</strong> Organized as a reusable toolkit for other researchers.</li>
-                    <li style="margin-bottom: 1rem;"><strong style="color:white">Documentation:</strong> Clear guides for installation and usage to democratize access to spatial intelligence.</li>
+                    <li style="margin-bottom: 0.8rem;"><strong style="color:white">src/ layout:</strong> Clean separation of <code style="color: var(--accent-color)">io</code>, <code style="color: var(--accent-color)">preprocessing</code>, <code style="color: var(--accent-color)">metrics</code>, <code style="color: var(--accent-color)">analysis</code>, and <code style="color: var(--accent-color)">visualization</code> modules.</li>
+                    <li style="margin-bottom: 0.8rem;"><strong style="color:white">Single-command pipeline:</strong> Running <code style="color: var(--accent-color)">python main.py</code> regenerates all 8 visualization assets end-to-end in under 90 seconds.</li>
+                    <li style="margin-bottom: 0.8rem;"><strong style="color:white">Linting:</strong> Enforced via Ruff for clean, consistent, production-grade Python.</li>
                 </ul>
             </section>
-            
+
             <!-- FUTURE -->
             <section class="story-section" id="future">
                 <h2>THE FUTURE</h2>
-                <p>This tool empowers local governance with data-driven urban planning capabilities, accessible without expensive proprietary licenses.</p>
-                <a href="#" onclick="document.getElementById('viz-drawer').classList.toggle('collapsed'); return false;" style="display:inline-block; margin-top:2rem; padding: 1rem 2rem; border: 1px solid var(--accent-color); color: var(--accent-color); text-decoration: none; text-transform: uppercase; letter-spacing: 2px; transition: all 0.3s;">
+                <h3>What comes next</h3>
+                <p>This pipeline is a foundation — future iterations will incorporate time-series regression to forecast 2030 population growth, satellite-derived land-use data, and infrastructure vulnerability scoring.</p>
+                <p>The goal: empower local governance with spatial intelligence tools that were previously locked behind expensive proprietary GIS licenses.</p>
+                <a href="#" onclick="document.getElementById('viz-drawer').classList.toggle('collapsed'); return false;" style="display:inline-block; margin-top:1.5rem; padding: 0.8rem 1.8rem; border: 1px solid var(--accent-color); color: var(--accent-color); text-decoration: none; text-transform: uppercase; letter-spacing: 2px; font-family: var(--font-heading); font-size: 0.9rem; transition: all 0.3s;">
                     Explore the Globe ➔
                 </a>
             </section>
 
-            <footer style="padding: 4rem 10%; color: #555; font-size: 0.9rem;">
-                <p>POPULATION URBAN EXPLORER PROJECT &copy; 2026</p>
+            <footer style="padding: 2rem 10%; color: #555; font-size: 0.85rem;">
+                <p>POPULATION URBAN EXPLORER PROJECT &copy; 2026 — Spatial Intelligence Pipeline V2</p>
             </footer>
 
         </div>
     </div>
 
-    <!-- Script to handle interactions -->
     <script src="script.js"></script>
 </body>
 </html>
