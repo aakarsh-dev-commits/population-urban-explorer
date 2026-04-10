@@ -246,3 +246,118 @@ def generate_high_end_globe_html(world_pop, output_path):
         f.write(html_content)
     
     return output_path
+
+HOTSPOT_COLORS = {
+    "High-High (Hotspot)": "red",
+    "Low-Low (Coldspot)": "blue",
+    "High-Low": "lightblue",
+    "Low-High": "orange",
+    "Not Significant": "lightgrey",
+    "No Data": "white"
+}
+
+def plot_interactive_hotspots(world_pop):
+    world_plot = world_pop.to_crs("EPSG:4326")
+    geojson = json.loads(world_plot.to_json())
+
+    fig = px.choropleth(
+        world_plot,
+        geojson=geojson,
+        locations="ADM0_A3",
+        featureidkey="properties.ADM0_A3",
+        color="hotspot_category",
+        color_discrete_map=HOTSPOT_COLORS,
+        hover_name="ADMIN",
+        hover_data={
+            "hotspot_category": True,
+            "pop_density_disp": True,
+            "ADM0_A3": False
+        },
+        labels={"hotspot_category": "Hotspot Category", "pop_density_disp": "Pop Density"}
+    )
+    fig.update_geos(showframe=False, showcoastlines=False, projection_type="natural earth")
+    fig.update_layout(title="Population Density Hotspots (Local Moran's I)", margin={"r":0,"t":40,"l":0,"b":0})
+    return fig
+
+
+def plot_hotspots_globe(world_pop):
+    fig = plot_interactive_hotspots(world_pop)
+    fig.update_geos(projection_type="orthographic", showcoastlines=False, showcountries=False, showframe=False)
+    fig.update_layout(title="Population Density Hotspots (3D Globe)")
+    return fig
+
+
+def plot_interactive_clusters(world_pop):
+    world_plot = world_pop.to_crs("EPSG:4326")
+    geojson = json.loads(world_plot.to_json())
+
+    fig = px.choropleth(
+        world_plot,
+        geojson=geojson,
+        locations="ADM0_A3",
+        featureidkey="properties.ADM0_A3",
+        color="cluster",
+        color_discrete_sequence=px.colors.qualitative.Set1,
+        hover_name="ADMIN",
+        hover_data={
+            "cluster": True,
+            "pop_density_disp": True,
+            "ADM0_A3": False
+        },
+        labels={"cluster": "KMeans Cluster"}
+    )
+    fig.update_geos(showframe=False, showcoastlines=False, projection_type="natural earth")
+    fig.update_layout(title="Population & Density Clusters", margin={"r":0,"t":40,"l":0,"b":0})
+    return fig
+
+
+def plot_clusters_globe(world_pop):
+    fig = plot_interactive_clusters(world_pop)
+    fig.update_geos(projection_type="orthographic", showcoastlines=False, showcountries=False, showframe=False)
+    fig.update_layout(title="Population & Density Clusters (3D Globe)")
+    return fig
+
+def plot_idw_surface(grid_x, grid_y, grid_z, world_pop):
+    fig, ax = plt.subplots(1, 1, figsize=(15, 8))
+    
+    contour = ax.contourf(grid_x, grid_y, grid_z, levels=50, cmap="viridis", alpha=0.9)
+    
+    world_plot = world_pop.to_crs("EPSG:4326")
+    world_plot.boundary.plot(ax=ax, linewidth=0.4, color="white", alpha=0.6)
+    
+    cbar = fig.colorbar(contour, ax=ax, fraction=0.03, pad=0.04)
+    cbar.set_label("Log Population Density")
+    
+    ax.set_title("IDW Interpolated Population Density Surface", fontsize=14)
+    ax.set_aspect('auto')
+    ax.axis("off")
+    
+    return fig
+
+
+def plot_interactive_idw_surface(world_pop):
+    valid = world_pop.dropna(subset=['log_density']).copy()
+    valid_plot = valid.to_crs("EPSG:4326")
+    
+    valid_plot['centroid_lat'] = valid_plot.geometry.centroid.y
+    valid_plot['centroid_lon'] = valid_plot.geometry.centroid.x
+    
+    fig = px.density_mapbox(
+        valid_plot, 
+        lat='centroid_lat', 
+        lon='centroid_lon', 
+        z='log_density',
+        radius=40,
+        center=dict(lat=20, lon=0), 
+        zoom=0.8,
+        mapbox_style="carto-darkmatter",
+        color_continuous_scale="viridis",
+        hover_name="ADMIN"
+    )
+    
+    fig.update_layout(
+        title="Interactive Density Interpolation Surface", 
+        margin={"r":0,"t":40,"l":0,"b":0},
+        coloraxis_colorbar=dict(title="Log Density")
+    )
+    return fig

@@ -1,7 +1,14 @@
+import os
+import numpy as np
 from src.io import load_countries, load_population
 from src.preprocessing import reproject_equal_area, reproject_geographic, merge_population, compute_display_columns
 from src.metrics import compute_area_km2, compute_population, compute_pop_density, compute_log_density
-from src.visualization import plot_static_chloropleth, plot_interactive_choropleth, plot_globe, generate_high_end_globe_html
+from src.analysis import compute_hotspots, compute_clusters, compute_idw_grid
+from src.visualization import (
+    plot_static_chloropleth, plot_interactive_choropleth, plot_globe, 
+    generate_high_end_globe_html, plot_interactive_hotspots, plot_hotspots_globe, 
+    plot_interactive_clusters, plot_clusters_globe, plot_idw_surface
+)
 
 def main():
     print("🚀 Starting Population Urban Explorer Pipeline...")
@@ -30,10 +37,12 @@ def main():
     # Add display columns
     world_pop = compute_display_columns(world_pop)
 
+    print("📊 Running advanced spatial analysis...")
+    world_pop = compute_hotspots(world_pop)
+    world_pop = compute_clusters(world_pop, n_clusters=5)
+
     # 4. Visualizations
     print("🎨 Generating visualizations...")
-    
-    import os
     os.makedirs("web/assets", exist_ok=True)
 
     # Static Plot
@@ -52,6 +61,41 @@ def main():
     print("   - Generating High-End 3D globe...")
     generate_high_end_globe_html(world_pop, "web/assets/globe_population_density.html")
     print("     Saved to web/assets/globe_population_density.html")
+
+    print("   - Generating Hotspots Interactive map & Globe...")
+    fig_hotspot = plot_interactive_hotspots(world_pop)
+    fig_hotspot.write_html("web/assets/interactive_hotspots.html")
+    fig_hotspot_globe = plot_hotspots_globe(world_pop)
+    fig_hotspot_globe.write_html("web/assets/globe_hotspots.html")
+
+    print("   - Generating Clusters Interactive map & Globe...")
+    fig_cluster = plot_interactive_clusters(world_pop)
+    fig_cluster.write_html("web/assets/interactive_clusters.html")
+    fig_cluster_globe = plot_clusters_globe(world_pop)
+    fig_cluster_globe.write_html("web/assets/globe_clusters.html")
+
+    print("   - Generating IDW Surface...")
+    valid = world_pop.dropna(subset=['log_density']).copy()
+    valid_plot = valid.to_crs("EPSG:4326")
+    # For accurate spatial queries, it's actually better to use equal-area centroids for the tree search, 
+    # but the grid needs to align with the visual extent (EPSG 4326 bounds)
+    # Using geographic centroids directly for distance isn't physically accurate but acceptable for web viz.
+    # To avoid scipy cKDTree spherical distance issues, we use nearest neighbor weighting.
+    with np.errstate(invalid='ignore'):
+        points = np.c_[valid_plot.geometry.centroid.x, valid_plot.geometry.centroid.y]
+        values = valid_plot['log_density'].values
+        minx, miny, maxx, maxy = valid_plot.total_bounds
+        grid_x, grid_y = np.mgrid[minx:maxx:300j, miny:maxy:150j]
+        grid_z = compute_idw_grid(points, values, grid_x, grid_y)
+    
+    fig_idw = plot_idw_surface(grid_x, grid_y, grid_z, world_pop)
+    fig_idw.savefig("web/assets/static_idw_surface.png")
+    
+    print("   - Generating Interactive IDW Surface...")
+    from src.visualization import plot_interactive_idw_surface
+    fig_interactive_idw = plot_interactive_idw_surface(world_pop)
+    fig_interactive_idw.write_html("web/assets/interactive_idw_surface.html")
+    print("     Saved interactive IDW surface HTML")
 
     print("✅ Pipeline completed successfully!")
 

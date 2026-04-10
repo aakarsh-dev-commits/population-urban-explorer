@@ -6,43 +6,72 @@ vizToggleBtn.addEventListener('click', () => {
     vizDrawer.classList.toggle('collapsed');
 });
 
-// Mode Toggle Logic (2D vs 3D)
-const modeOptions = document.querySelectorAll('.mode-option');
+// State Matrix Logic
+let currentModel = 'density';
+let currentMode = '3d';
+
+const fileMap = {
+    'density': {
+        '3d': 'assets/globe_population_density.html',
+        '2d': 'assets/interactive_population_density.html'
+    },
+    'hotspots': {
+        '3d': 'assets/globe_hotspots.html',
+        '2d': 'assets/interactive_hotspots.html'
+    },
+    'clusters': {
+        '3d': 'assets/globe_clusters.html',
+        '2d': 'assets/interactive_clusters.html'
+    },
+    'idw': {
+        '3d': 'assets/interactive_idw_surface.html',
+        '2d': 'assets/interactive_idw_surface.html'
+    }
+};
+
 const globeFrame = document.getElementById('globe-frame');
 
+function updateViz() {
+    const src = fileMap[currentModel][currentMode];
+    if(globeFrame.src !== new URL(src, document.baseURI).href) {
+        globeFrame.src = src;
+    }
+}
+
+// Mode Toggle Logic (2D vs 3D) Left
+const modeOptions = document.querySelectorAll('.mode-option');
 modeOptions.forEach(option => {
     option.addEventListener('click', () => {
-        // Remove active class from all
         modeOptions.forEach(opt => opt.classList.remove('active'));
-        // Add active class to clicked
         option.classList.add('active');
-        
-        // Switch iframe source
-        const mode = option.dataset.mode;
-        if (mode === '3d') {
-            globeFrame.src = 'assets/globe_population_density.html';
-        } else if (mode === '2d') {
-            globeFrame.src = 'assets/interactive_population_density.html';
-        }
+        currentMode = option.dataset.mode;
+        updateViz();
+    });
+});
+
+// Model Toggle Logic (Top Nav)
+const topTabs = document.querySelectorAll('.top-tab');
+topTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+        topTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentModel = tab.dataset.model;
+        updateViz();
     });
 });
 
 // Scrollytelling Animation Logic
-// Uses IntersectionObserver to fade in sections as they scroll into view
 const observerOptions = {
-    root: null, // viewport
+    root: null,
     rootMargin: '0px',
-    threshold: 0.3 // Trigger when 30% of the section is visible
+    threshold: 0.3
 };
 
 const observer = new IntersectionObserver((entries, observer) => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
             entry.target.classList.add('active');
-            // Optional: Log current phase for debugging or future map triggers
-            console.log('Active Section:', entry.target.id);
         } else {
-            // Optional: Remove class to fade out when scrolling away
             entry.target.classList.remove('active');
         }
     });
@@ -52,8 +81,7 @@ document.querySelectorAll('.story-section').forEach(section => {
     observer.observe(section);
 });
 
-// Start with drawer expanded on large screens, collapsed on mobile?
-// For now, default is expanded (50% width) as defined in CSS.
+// Default drawer behavior
 if (window.innerWidth < 768) {
     vizDrawer.classList.add('collapsed');
 }

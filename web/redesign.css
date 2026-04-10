@@ -237,3 +237,43 @@ iframe {
 .hero-margin-box span {
     display: block;
 }
+
+/* Top Navigation Bar */
+#top-nav {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    display: flex;
+    gap: 2rem;
+    padding: 0.5rem 2rem;
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border-radius: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+}
+
+.top-tab {
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 2px solid transparent;
+    padding-bottom: 5px;
+}
+
+.top-tab:hover {
+    color: var(--accent-color);
+}
+
+.top-tab.active {
+    color: var(--accent-color);
+    border-bottom: 2px solid var(--accent-color);
+    text-shadow: 0 0 10px var(--accent-color);
+}
+
