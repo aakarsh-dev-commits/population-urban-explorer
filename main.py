@@ -7,7 +7,8 @@ from src.analysis import compute_hotspots, compute_clusters, compute_idw_grid
 from src.visualization import (
     plot_static_chloropleth, plot_interactive_choropleth, plot_globe, 
     generate_high_end_globe_html, plot_interactive_hotspots, plot_hotspots_globe, 
-    plot_interactive_clusters, plot_clusters_globe, plot_idw_surface
+    plot_interactive_clusters, plot_clusters_globe, plot_idw_surface,
+    plot_interactive_idw_surface, generate_hotspots_globe_html, generate_clusters_globe_html
 )
 
 def main():
@@ -65,14 +66,12 @@ def main():
     print("   - Generating Hotspots Interactive map & Globe...")
     fig_hotspot = plot_interactive_hotspots(world_pop)
     fig_hotspot.write_html("web/assets/interactive_hotspots.html")
-    fig_hotspot_globe = plot_hotspots_globe(world_pop)
-    fig_hotspot_globe.write_html("web/assets/globe_hotspots.html")
+    generate_hotspots_globe_html(world_pop, "web/assets/globe_hotspots.html")
 
     print("   - Generating Clusters Interactive map & Globe...")
     fig_cluster = plot_interactive_clusters(world_pop)
     fig_cluster.write_html("web/assets/interactive_clusters.html")
-    fig_cluster_globe = plot_clusters_globe(world_pop)
-    fig_cluster_globe.write_html("web/assets/globe_clusters.html")
+    generate_clusters_globe_html(world_pop, "web/assets/globe_clusters.html")
 
     print("   - Generating IDW Surface...")
     valid = world_pop.dropna(subset=['log_density']).copy()

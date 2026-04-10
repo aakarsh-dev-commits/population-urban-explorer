@@ -247,6 +247,253 @@ def generate_high_end_globe_html(world_pop, output_path):
     
     return output_path
 
+
+def generate_hotspots_globe_html(world_pop, output_path):
+    """
+    Generates a Globe.gl 3D globe for Hotspot Detection with the same
+    space background as the original density globe.
+    Polygons are colored by hotspot category.
+    """
+    world_plot = world_pop.to_crs("EPSG:4326")
+    geojson_str = world_plot.to_json()
+
+    # Build polygon color lookup from the hotspot_category column
+    poly_colors = {}
+    color_map = {
+        "High-High (Hotspot)": "rgba(220,0,0,0.85)",
+        "Low-Low (Coldspot)": "rgba(0,80,220,0.85)",
+        "High-Low": "rgba(100,180,255,0.75)",
+        "Low-High": "rgba(255,160,0,0.75)",
+        "Not Significant": "rgba(60,60,80,0.5)",
+        "No Data": "rgba(30,30,40,0.4)"
+    }
+
+    for _, row in world_plot.iterrows():
+        cat = row.get("hotspot_category", "No Data")
+        if isinstance(cat, float):
+            cat = "No Data"
+        poly_colors[row["ADM0_A3"]] = color_map.get(cat, "rgba(30,30,40,0.4)")
+
+    colors_json = json.dumps(poly_colors)
+
+    # Build tooltip data
+    tooltip_data = []
+    for _, row in world_plot.iterrows():
+        cat = row.get("hotspot_category", "No Data")
+        if isinstance(cat, float):
+            cat = "No Data"
+        tooltip_data.append({
+            "iso": row["ADM0_A3"],
+            "country": row["ADMIN"],
+            "cat": cat,
+            "density": row.get("pop_density_disp", "N/A")
+        })
+    tooltip_json = json.dumps(tooltip_data)
+
+    # Legend HTML embedded in the page
+    legend_html = "".join([
+        f'<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">'
+        f'<div style="width:14px;height:14px;border-radius:3px;background:{v};flex-shrink:0;"></div>'
+        f'<span>{k}</span></div>'
+        for k, v in color_map.items()
+    ])
+
+    html_content = f'''<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {{ margin: 0; overflow: hidden; background-color: #000; }}
+        #globeViz {{ width: 100vw; height: 100vh; }}
+        #legend {{
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(5,5,16,0.85);
+            border: 1px solid rgba(0,212,255,0.3);
+            border-radius: 10px;
+            padding: 14px 18px;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            backdrop-filter: blur(8px);
+        }}
+        #legend h4 {{ margin: 0 0 10px; color: #00d4ff; letter-spacing: 1px; font-size: 12px; text-transform: uppercase; }}
+    </style>
+    <script src="//unpkg.com/globe.gl"></script>
+</head>
+<body>
+<div id="globeViz"></div>
+<div id="legend">
+    <h4>Hotspot Category</h4>
+    {legend_html}
+</div>
+
+<script>
+    const polygonData = {geojson_str};
+    const colorMap = {colors_json};
+    const tooltipData = {tooltip_json};
+    const tooltipLookup = {{}};
+    tooltipData.forEach(d => tooltipLookup[d.iso] = d);
+
+    setTimeout(function() {{
+        const myGlobe = Globe()
+            .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
+            .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png')
+
+            .polygonsData(polygonData.features)
+            .polygonCapColor(f => colorMap[f.properties.ADM0_A3] || 'rgba(30,30,40,0.4)')
+            .polygonSideColor(() => 'rgba(0,0,0,0)')
+            .polygonStrokeColor(() => 'rgba(0,212,255,0.2)')
+            .polygonAltitude(0.006)
+            .polygonLabel(f => {{
+                const d = tooltipLookup[f.properties.ADM0_A3];
+                if (!d) return '';
+                return `<div style="background:rgba(0,0,0,0.85);color:#fff;padding:10px;border-radius:5px;font-family:sans-serif;">
+                    <b>${{d.country}}</b><br/>
+                    Category: <span style="color:#00d4ff">${{d.cat}}</span><br/>
+                    Density: ${{d.density}} /km²
+                </div>`;
+            }})
+
+            (document.getElementById('globeViz'));
+
+        myGlobe.controls().autoRotate = true;
+        myGlobe.controls().autoRotateSpeed = 0.5;
+        myGlobe.pointOfView({{ altitude: 2.5 }});
+    }}, 100);
+</script>
+</body>
+</html>
+'''
+
+    with open(output_path, "w", encoding="utf-8") as f:
+        f.write(html_content)
+    return output_path
+
+
+def generate_clusters_globe_html(world_pop, output_path):
+    """
+    Generates a Globe.gl 3D globe for KMeans Clusters with the same
+    space background as the original density globe.
+    Polygons are colored by cluster assignment.
+    """
+    world_plot = world_pop.to_crs("EPSG:4326")
+    geojson_str = world_plot.to_json()
+
+    # Assign distinct vibrant colors to each cluster
+    cluster_palette = {
+        "Cluster 1": "rgba(220,50,50,0.85)",
+        "Cluster 2": "rgba(50,200,120,0.85)",
+        "Cluster 3": "rgba(80,140,255,0.85)",
+        "Cluster 4": "rgba(255,180,0,0.85)",
+        "Cluster 5": "rgba(200,80,220,0.85)",
+        "No Data": "rgba(30,30,40,0.4)"
+    }
+
+    poly_colors = {}
+    for _, row in world_plot.iterrows():
+        cl = row.get("cluster", "No Data")
+        if isinstance(cl, float):
+            cl = "No Data"
+        poly_colors[row["ADM0_A3"]] = cluster_palette.get(cl, "rgba(30,30,40,0.4)")
+
+    colors_json = json.dumps(poly_colors)
+
+    tooltip_data = []
+    for _, row in world_plot.iterrows():
+        cl = row.get("cluster", "No Data")
+        if isinstance(cl, float):
+            cl = "No Data"
+        tooltip_data.append({
+            "iso": row["ADM0_A3"],
+            "country": row["ADMIN"],
+            "cluster": cl,
+            "density": row.get("pop_density_disp", "N/A")
+        })
+    tooltip_json = json.dumps(tooltip_data)
+
+    legend_html = "".join([
+        f'<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">'
+        f'<div style="width:14px;height:14px;border-radius:3px;background:{v};flex-shrink:0;"></div>'
+        f'<span>{k}</span></div>'
+        for k, v in cluster_palette.items()
+    ])
+
+    html_content = f'''<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {{ margin: 0; overflow: hidden; background-color: #000; }}
+        #globeViz {{ width: 100vw; height: 100vh; }}
+        #legend {{
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(5,5,16,0.85);
+            border: 1px solid rgba(0,212,255,0.3);
+            border-radius: 10px;
+            padding: 14px 18px;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            backdrop-filter: blur(8px);
+        }}
+        #legend h4 {{ margin: 0 0 10px; color: #00d4ff; letter-spacing: 1px; font-size: 12px; text-transform: uppercase; }}
+    </style>
+    <script src="//unpkg.com/globe.gl"></script>
+</head>
+<body>
+<div id="globeViz"></div>
+<div id="legend">
+    <h4>KMeans Cluster</h4>
+    {legend_html}
+</div>
+
+<script>
+    const polygonData = {geojson_str};
+    const colorMap = {colors_json};
+    const tooltipData = {tooltip_json};
+    const tooltipLookup = {{}};
+    tooltipData.forEach(d => tooltipLookup[d.iso] = d);
+
+    setTimeout(function() {{
+        const myGlobe = Globe()
+            .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
+            .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png')
+
+            .polygonsData(polygonData.features)
+            .polygonCapColor(f => colorMap[f.properties.ADM0_A3] || 'rgba(30,30,40,0.4)')
+            .polygonSideColor(() => 'rgba(0,0,0,0)')
+            .polygonStrokeColor(() => 'rgba(0,212,255,0.2)')
+            .polygonAltitude(0.006)
+            .polygonLabel(f => {{
+                const d = tooltipLookup[f.properties.ADM0_A3];
+                if (!d) return '';
+                return `<div style="background:rgba(0,0,0,0.85);color:#fff;padding:10px;border-radius:5px;font-family:sans-serif;">
+                    <b>${{d.country}}</b><br/>
+                    Cluster: <span style="color:#00d4ff">${{d.cluster}}</span><br/>
+                    Density: ${{d.density}} /km²
+                </div>`;
+            }})
+
+            (document.getElementById('globeViz'));
+
+        myGlobe.controls().autoRotate = true;
+        myGlobe.controls().autoRotateSpeed = 0.5;
+        myGlobe.pointOfView({{ altitude: 2.5 }});
+    }}, 100);
+</script>
+</body>
+</html>
+'''
+
+    with open(output_path, "w", encoding="utf-8") as f:
+        f.write(html_content)
+    return output_path
+
+
 HOTSPOT_COLORS = {
     "High-High (Hotspot)": "red",
     "Low-Low (Coldspot)": "blue",
@@ -275,14 +522,28 @@ def plot_interactive_hotspots(world_pop):
         },
         labels={"hotspot_category": "Hotspot Category", "pop_density_disp": "Pop Density"}
     )
-    fig.update_geos(showframe=False, showcoastlines=False, projection_type="natural earth")
-    fig.update_layout(title="Population Density Hotspots (Local Moran's I)", margin={"r":0,"t":40,"l":0,"b":0})
+    fig.update_geos(
+        showframe=False, 
+        showcoastlines=False, 
+        projection_type="natural earth",
+        bgcolor="#000000",
+        showocean=True, oceancolor="#050510",
+        showland=True, landcolor="#111115",
+        showlakes=True, lakecolor="#050510"
+    )
+    fig.update_layout(
+        title="Population Density Hotspots (Local Moran's I)", 
+        margin={"r":0,"t":40,"l":0,"b":0},
+        template="plotly_dark",
+        paper_bgcolor="#000000",
+        plot_bgcolor="#000000"
+    )
     return fig
 
 
 def plot_hotspots_globe(world_pop):
     fig = plot_interactive_hotspots(world_pop)
-    fig.update_geos(projection_type="orthographic", showcoastlines=False, showcountries=False, showframe=False)
+    fig.update_geos(projection_type="orthographic")
     fig.update_layout(title="Population Density Hotspots (3D Globe)")
     return fig
 
@@ -306,14 +567,28 @@ def plot_interactive_clusters(world_pop):
         },
         labels={"cluster": "KMeans Cluster"}
     )
-    fig.update_geos(showframe=False, showcoastlines=False, projection_type="natural earth")
-    fig.update_layout(title="Population & Density Clusters", margin={"r":0,"t":40,"l":0,"b":0})
+    fig.update_geos(
+        showframe=False, 
+        showcoastlines=False, 
+        projection_type="natural earth",
+        bgcolor="#000000",
+        showocean=True, oceancolor="#050510",
+        showland=True, landcolor="#111115",
+        showlakes=True, lakecolor="#050510"
+    )
+    fig.update_layout(
+        title="Population & Density Clusters", 
+        margin={"r":0,"t":40,"l":0,"b":0},
+        template="plotly_dark",
+        paper_bgcolor="#000000",
+        plot_bgcolor="#000000"
+    )
     return fig
 
 
 def plot_clusters_globe(world_pop):
     fig = plot_interactive_clusters(world_pop)
-    fig.update_geos(projection_type="orthographic", showcoastlines=False, showcountries=False, showframe=False)
+    fig.update_geos(projection_type="orthographic")
     fig.update_layout(title="Population & Density Clusters (3D Globe)")
     return fig
 
